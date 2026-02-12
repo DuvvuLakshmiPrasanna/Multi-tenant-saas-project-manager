@@ -44,6 +44,7 @@ CREATE TABLE projects (
 CREATE TABLE tasks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE NOT NULL,
     assigned_to UUID REFERENCES users(id) ON DELETE SET NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -53,6 +54,10 @@ CREATE TABLE tasks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create index on tasks.tenant_id for performance
+CREATE INDEX idx_tasks_tenant_id ON tasks(tenant_id);
+CREATE INDEX idx_tasks_project_id ON tasks(project_id);
 
 -- Audit Logs Table
 CREATE TABLE audit_logs (
