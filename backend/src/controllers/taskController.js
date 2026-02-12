@@ -23,12 +23,15 @@ exports.createTask = async (req, res) => {
             }
         }
 
+        // Get tenant_id from project for task creation
+        const projectTenantId = projectRes.rows[0].tenant_id;
+
         const result = await pool.query(
-            'INSERT INTO tasks (project_id, title, description, assigned_to, priority, due_date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [projectId, title, description, assignedTo, priority || 'medium', dueDate]
+            'INSERT INTO tasks (project_id, tenant_id, title, description, assigned_to, priority, due_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [projectId, projectTenantId, title, description, assignedTo, priority || 'medium', dueDate]
         );
 
-        res.status(201).json({ success: true, data: { ...result.rows[0], tenantId } });
+        res.status(201).json({ success: true, data: result.rows[0] });
 
     } catch (err) {
         console.error(err);
